@@ -1,6 +1,5 @@
 % Test contour
-I = readImage(rgb);
-I(isnan(I)) = 255;
+I = imread('toyobjects.png');
 imshow(I)
 hold on
 title('Original Image');

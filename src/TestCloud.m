@@ -1,3 +1,12 @@
+load('object3d.mat')
+
+figure
+pcshow(ptCloud)
+xlabel('X(m)')
+ylabel('Y(m)')
+zlabel('Z(m)')
+title('Original Point Cloud')
+
 maxDistance = 0.02;
 referenceVector = [0,0,1];
 maxAngularDistance = 5;
@@ -17,4 +26,14 @@ remainPtCloud = select(remainPtCloud,outlierIndices);
 
 figure
 pcshow(plane1)
-title('First Plane')
+title('Floor')
+
+
+figure
+pcshow(plane2)
+title('Wall')
+
+
+figure
+pcshow(remainPtCloud)
+title('Others')
