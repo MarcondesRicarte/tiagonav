@@ -4,8 +4,8 @@ connect = 'tiago';      % ['turtle','tiago']
 
 if strcmp(connect,'tiago') 
     % Connect  TIAGo robot
-    setenv('ROS_MASTER_URI','http://192.168.3.134:11311')
-    setenv('ROS_IP','192.168.172.1')
+    setenv('ROS_MASTER_URI','http://192.168.3.129:11311')
+    setenv('ROS_IP','192.168.254.1')
     rosinit
 elseif strcmp(connect,'turtle')
     %Tutllebot
@@ -35,8 +35,8 @@ end;
 
 % Get image
 imsub = 0;
-if ismember('/xtion/depth_registered/image_raw', rostopic('list'))
-    imsub = rossubscriber('/xtion/depth_registered/image_raw');
+if ismember('/xtion/rgb/image_raw', rostopic('list'))
+    imsub = rossubscriber('/xtion/rgb/image_raw');
 end;
 
 % Get depth image
