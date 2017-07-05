@@ -36,30 +36,32 @@ end;
 
 count = 0;
 disp('Saving...');
-for i=1:20
+for i=1:50
     count = count + 1
 
     % plot image
     if imsub ~= 0
         image = receive(imsub);
-        imageData(count) = image;
+        %imageData(count) = image;
     end;
 
     % plot depth image
     if depthsub ~= 0
         depthImage = receive(depthsub);
-        depthImageData(count) = depthImage;  
+        %depthImageData(count) = depthImage;  
     end;
     
     % plot cloud points
     if pointsub ~= 0
         ptcloud = receive(pointsub);
-        ptcloudData(count) = ptcloud;
+        %ptcloudData(count) = ptcloud;
     end;
-    
+
+    %save gazeboData image depthImage ptcloud;
+    save(['gazeboData', num2str(count), '.mat'], 'image', 'depthImage', 'ptcloud');
 end;
 
-disp('Saving...');
-save gazeboData imageData depthImageData ptcloudData;
+%disp('Saving...');
+%save gazeboData imageData depthImageData ptcloudData;
 
 rosshutdown
