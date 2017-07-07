@@ -1,54 +1,36 @@
 % config
 connect = 'tiago';      % ['turtle','tiago'] 
+source = 'file';        % ['file', 'simulator']
 
+if strcmp(source,'simulator')
+    if strcmp(connect,'tiago') 
+        % Connect  TIAGo robot
+        setenv('ROS_MASTER_URI','http://192.168.3.129:11311')
+        setenv('ROS_IP','192.168.254.1')
+        rosinit
+    elseif strcmp(connect,'turtle')
+        %Tutllebot
+        ipaddress = '192.168.3.133';
+        rosinit(ipaddress);
+    end;
 
-if strcmp(connect,'tiago') 
-    % Connect  TIAGo robot
-    setenv('ROS_MASTER_URI','http://192.168.3.129:11311')
-    setenv('ROS_IP','192.168.254.1')
-    rosinit
-elseif strcmp(connect,'turtle')
-    %Tutllebot
-    ipaddress = '192.168.3.133';
-    rosinit(ipaddress);
-end;
+    % Get image
+    imsub = 0;
+    if ismember('/xtion/rgb/image_raw', rostopic('list'))
+        imsub = rossubscriber('/xtion/rgb/image_raw');
+    end;
 
-% % Clock
-% if ismember('/clock', rostopic('list'))
-%     clock = rossubscriber('/clock');
-% end;
-% 
-% clockdata = receive(clock,3);
-% 
-% 
-% % Position
-% if ismember('/mobile_base_controller/odom', rostopic('list'))
-%     odom = rossubscriber('/mobile_base_controller/odom');
-% end;
-% 
-% odomdata = receive(odom,3);
-% pose = odomdata.Pose.Pose;
-% x = pose.Position.X;
-% y = pose.Position.Y;
-% z = pose.Position.Z;
+    % Get depth image
+    depthsub = 0;
+    if ismember('/xtion/depth_registered/image_raw', rostopic('list'))
+        depthsub = rossubscriber('/xtion/depth_registered/image_raw');
+    end;
 
-
-% Get image
-imsub = 0;
-if ismember('/xtion/rgb/image_raw', rostopic('list'))
-    imsub = rossubscriber('/xtion/rgb/image_raw');
-end;
-
-% Get depth image
-depthsub = 0;
-if ismember('/xtion/depth_registered/image_raw', rostopic('list'))
-    depthsub = rossubscriber('/xtion/depth_registered/image_raw');
-end;
-
-% Get cloud point
-pointsub = 0;
-if ismember('/xtion/depth_registered/points', rostopic('list'))
-    pointsub = rossubscriber('/xtion/depth_registered/points');
+    % Get cloud point
+    pointsub = 0;
+    if ismember('/xtion/depth_registered/points', rostopic('list'))
+        pointsub = rossubscriber('/xtion/depth_registered/points');
+    end;
 end;
 
 
@@ -75,6 +57,10 @@ if pointsub ~= 0
     xyzvalid = xyz(~isnan(xyz(:,1)),:);
     rgb = readRGB(ptcloud);
     scatter3(ptcloud);
+    xyzselected = xyz(xyz(:,3)< 2,:);
+    scatter(xyzselected(:,1),xyzselected(:,2))
+    pcobj = pointCloud(readXYZ(ptcloud),'Color',uint8(255*readRGB(ptcloud)));
+    scatter(xyzselected(:,1),xyzselected(:,2),10)
 end;
 
 
