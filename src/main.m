@@ -55,12 +55,36 @@ if pointsub ~= 0
     ptcloud = receive(pointsub);
     xyz = readXYZ(ptcloud);
     xyzvalid = xyz(~isnan(xyz(:,1)),:);
-    rgb = readRGB(ptcloud);
-    scatter3(ptcloud);
     xyzselected = xyz(xyz(:,3)< 2,:);
-    scatter(xyzselected(:,1),xyzselected(:,2))
+    %rgb = readRGB(ptcloud);
+    scatter3(ptcloud);
+    
+    %scatter(xyzselected(:,1),xyzselected(:,2))
     pcobj = pointCloud(readXYZ(ptcloud),'Color',uint8(255*readRGB(ptcloud)));
-    scatter(xyzselected(:,1),xyzselected(:,2),10)
+    
+    
+    % parser cordinates
+    minX = min(xyz(:,1));
+    maxX = max(xyz(:,1));
+    minY = min(xyz(:,2));
+    maxY = max(xyz(:,2));
+    minZ = min(xyz(:,3));
+    maxZ = max(xyz(:,3));
+    
+    sizeX = - minX + maxX;
+    sizeY = - minY + maxY;
+    sizeZ = minZ + maxZ;
+    
+    pcshow(pcobj)
+    roi = [0,inf;0,inf;0,2.5];
+    indices = findPointsInROI(pcobj, roi);
+    obj = select(pcobj,indices);
+    
+    pcshow(pcobj.Location,'r');
+    hold on;
+    pcshow(obj.Location,'g');
+    hold off;
+    
 end;
 
 
