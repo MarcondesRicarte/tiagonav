@@ -1,7 +1,12 @@
 % config
 connect = 'tiago';      % ['turtle','tiago'] 
 source = 'file';        % ['file', 'simulator']
+sourceDir = 'mat\amb1\gazeboData';  % ['mat\amb1\gazeboData', 'mat\amb2\gazeboData']
 
+
+imsub = 0;
+depthsub = 0;
+pointsub = 0;
 if strcmp(source,'simulator')
     if strcmp(connect,'tiago') 
         % Connect  TIAGo robot
@@ -34,56 +39,69 @@ if strcmp(source,'simulator')
 end;
 
 
-% plot image
-if imsub ~= 0
-    image = receive(imsub);
-    figure
-    imshow(readImage(image));
-end;
+for i=1:50
+    load ([sourceDir, num2str(i), '.mat']);
+    
+    % plot image
+    if imsub ~= 0
+        image = receive(imsub);
+        figure
+        imshow(readImage(image));
+    end;
 
 
-% plot depth image
-if depthsub ~= 0
-    depthImage = receive(depthsub);
-    figure
-    imshow(readImage(depthImage));
-end;
+    % plot depth image
+    if depthsub ~= 0
+        depthImage = receive(depthsub);
+        figure
+        imshow(readImage(depthImage));
+    end;
 
 
-% plot cloud points
-if pointsub ~= 0
-    ptcloud = receive(pointsub);
-    xyz = readXYZ(ptcloud);
-    xyzvalid = xyz(~isnan(xyz(:,1)),:);
-    xyzselected = xyz(xyz(:,3)< 2,:);
-    %rgb = readRGB(ptcloud);
+    % plot cloud points
+    if pointsub ~= 0
+        ptcloud = receive(pointsub);
+        xyz = readXYZ(ptcloud);
+        xyzvalid = xyz(~isnan(xyz(:,1)),:);
+        xyzselected = xyz(xyz(:,3)< 2,:);
+        %rgb = readRGB(ptcloud);
+        scatter3(ptcloud);
+
+        %scatter(xyzselected(:,1),xyzselected(:,2))
+        pcobj = pointCloud(readXYZ(ptcloud),'Color',uint8(255*readRGB(ptcloud)));
+
+
+        % parser cordinates
+        minX = min(xyz(:,1));
+        maxX = max(xyz(:,1));
+        minY = min(xyz(:,2));
+        maxY = max(xyz(:,2));
+        minZ = min(xyz(:,3));
+        maxZ = max(xyz(:,3));
+
+        sizeX = - minX + maxX;
+        sizeY = - minY + maxY;
+        sizeZ = minZ + maxZ;
+
+        pcshow(pcobj)
+        roi = [0,inf;0,inf;0,2.5];
+        indices = findPointsInROI(pcobj, roi);
+        obj = select(pcobj,indices);
+
+        pcshow(pcobj.Location,'r');
+        hold on;
+        pcshow(obj.Location,'g');
+        hold off;
+
+    end;
+    
+    imwrite(readImage(image),['image',int2str(i),'.png']);
+    Segmentation(readImage(image),['imageContour',int2str(i),'.png']);
+    close(gcf);
     scatter3(ptcloud);
-    
-    %scatter(xyzselected(:,1),xyzselected(:,2))
-    pcobj = pointCloud(readXYZ(ptcloud),'Color',uint8(255*readRGB(ptcloud)));
-    
-    
-    % parser cordinates
-    minX = min(xyz(:,1));
-    maxX = max(xyz(:,1));
-    minY = min(xyz(:,2));
-    maxY = max(xyz(:,2));
-    minZ = min(xyz(:,3));
-    maxZ = max(xyz(:,3));
-    
-    sizeX = - minX + maxX;
-    sizeY = - minY + maxY;
-    sizeZ = minZ + maxZ;
-    
-    pcshow(pcobj)
-    roi = [0,inf;0,inf;0,2.5];
-    indices = findPointsInROI(pcobj, roi);
-    obj = select(pcobj,indices);
-    
-    pcshow(pcobj.Location,'r');
-    hold on;
-    pcshow(obj.Location,'g');
-    hold off;
+    f = getframe(gca);
+    im = frame2im(f);
+    imwrite(im,['ptcloud',int2str(i),'.png']);
     
 end;
 
