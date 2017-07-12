@@ -1,80 +1,108 @@
 % config
 connect = 'tiago';      % ['turtle','tiago'] 
+source = 'file';        % ['file', 'simulator']
+sourceDir = 'mat\amb1\gazeboData';  % ['mat\amb1\gazeboData', 'mat\amb2\gazeboData']
 
 
-if strcmp(connect,'tiago') 
-    % Connect  TIAGo robot
-    setenv('ROS_MASTER_URI','http://192.168.3.129:11311')
-    setenv('ROS_IP','192.168.254.1')
-    rosinit
-elseif strcmp(connect,'turtle')
-    %Tutllebot
-    ipaddress = '192.168.3.133';
-    rosinit(ipaddress);
-end;
-
-% % Clock
-% if ismember('/clock', rostopic('list'))
-%     clock = rossubscriber('/clock');
-% end;
-% 
-% clockdata = receive(clock,3);
-% 
-% 
-% % Position
-% if ismember('/mobile_base_controller/odom', rostopic('list'))
-%     odom = rossubscriber('/mobile_base_controller/odom');
-% end;
-% 
-% odomdata = receive(odom,3);
-% pose = odomdata.Pose.Pose;
-% x = pose.Position.X;
-% y = pose.Position.Y;
-% z = pose.Position.Z;
-
-
-% Get image
 imsub = 0;
-if ismember('/xtion/rgb/image_raw', rostopic('list'))
-    imsub = rossubscriber('/xtion/rgb/image_raw');
-end;
-
-% Get depth image
 depthsub = 0;
-if ismember('/xtion/depth_registered/image_raw', rostopic('list'))
-    depthsub = rossubscriber('/xtion/depth_registered/image_raw');
-end;
-
-% Get cloud point
 pointsub = 0;
-if ismember('/xtion/depth_registered/points', rostopic('list'))
-    pointsub = rossubscriber('/xtion/depth_registered/points');
+if strcmp(source,'simulator')
+    if strcmp(connect,'tiago') 
+        % Connect  TIAGo robot
+        setenv('ROS_MASTER_URI','http://192.168.3.129:11311')
+        setenv('ROS_IP','192.168.254.1')
+        rosinit
+    elseif strcmp(connect,'turtle')
+        %Tutllebot
+        ipaddress = '192.168.3.133';
+        rosinit(ipaddress);
+    end;
+
+    % Get image
+    imsub = 0;
+    if ismember('/xtion/rgb/image_raw', rostopic('list'))
+        imsub = rossubscriber('/xtion/rgb/image_raw');
+    end;
+
+    % Get depth image
+    depthsub = 0;
+    if ismember('/xtion/depth_registered/image_raw', rostopic('list'))
+        depthsub = rossubscriber('/xtion/depth_registered/image_raw');
+    end;
+
+    % Get cloud point
+    pointsub = 0;
+    if ismember('/xtion/depth_registered/points', rostopic('list'))
+        pointsub = rossubscriber('/xtion/depth_registered/points');
+    end;
 end;
 
 
-% plot image
-if imsub ~= 0
-    image = receive(imsub);
-    figure
-    imshow(readImage(image));
-end;
+for i=1:50
+    load ([sourceDir, num2str(i), '.mat']);
+    
+    % plot image
+    if imsub ~= 0
+        image = receive(imsub);
+        figure
+        imshow(readImage(image));
+    end;
 
 
-% plot depth image
-if depthsub ~= 0
-    depthImage = receive(depthsub);
-    figure
-    imshow(readImage(depthImage));
-end;
+    % plot depth image
+    if depthsub ~= 0
+        depthImage = receive(depthsub);
+        figure
+        imshow(readImage(depthImage));
+    end;
 
 
-% plot cloud points
-if pointsub ~= 0
-    ptcloud = receive(pointsub);
-    xyz = readXYZ(ptcloud);
-    xyzvalid = xyz(~isnan(xyz(:,1)),:);
-    rgb = readRGB(ptcloud);
+    % plot cloud points
+    if pointsub ~= 0
+        ptcloud = receive(pointsub);
+        xyz = readXYZ(ptcloud);
+        xyzvalid = xyz(~isnan(xyz(:,1)),:);
+        xyzselected = xyz(xyz(:,3)< 2,:);
+        %rgb = readRGB(ptcloud);
+        scatter3(ptcloud);
+
+        %scatter(xyzselected(:,1),xyzselected(:,2))
+        pcobj = pointCloud(readXYZ(ptcloud),'Color',uint8(255*readRGB(ptcloud)));
+
+
+        % parser cordinates
+        minX = min(xyz(:,1));
+        maxX = max(xyz(:,1));
+        minY = min(xyz(:,2));
+        maxY = max(xyz(:,2));
+        minZ = min(xyz(:,3));
+        maxZ = max(xyz(:,3));
+
+        sizeX = - minX + maxX;
+        sizeY = - minY + maxY;
+        sizeZ = minZ + maxZ;
+
+        pcshow(pcobj)
+        roi = [0,inf;0,inf;0,2.5];
+        indices = findPointsInROI(pcobj, roi);
+        obj = select(pcobj,indices);
+
+        pcshow(pcobj.Location,'r');
+        hold on;
+        pcshow(obj.Location,'g');
+        hold off;
+
+    end;
+    
+    imwrite(readImage(image),['image',int2str(i),'.png']);
+    Segmentation(readImage(image),['imageContour',int2str(i),'.png']);
+    close(gcf);
     scatter3(ptcloud);
+    f = getframe(gca);
+    im = frame2im(f);
+    imwrite(im,['ptcloud',int2str(i),'.png']);
+    
 end;
 
 
