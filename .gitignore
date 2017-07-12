@@ -1,3 +1,7 @@
 src/TestCloud.asv
 src/images/amb1
 src/images/amb2
+src/matconvnet-1.0-beta24/models/
+src/matconvnet-1.0-beta24/data/
+*.asv
+src/matconvnet-1.0-beta24/imagenet-vgg-f.mat
