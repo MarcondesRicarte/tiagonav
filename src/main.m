@@ -1,7 +1,13 @@
 % config
+clear all;
+
 connect = 'tiago';      % ['turtle','tiago'] 
 source = 'file';        % ['file', 'simulator']
-sourceDir = 'mat\amb1\gazeboData';  % ['mat\amb1\gazeboData', 'mat\amb2\gazeboData']
+sourceDir = 'videos\amb1low.mp4';  % ['videos\amb1low.mp4', 'videos\amb2low.mp4', 'videos\amb1high.mp4', 'videos\amb1high.mp4']
+NETWORK_PATH = 'matconvnet-1.0-beta24\models';
+NET_NAME = 'pascal-fcn8s-dag.mat';
+DATA_DIR = fullfile('data', 'images');
+RESULT_DIR = fullfile('data', 'unaries');
 
 
 imsub = 0;
@@ -37,6 +43,18 @@ if strcmp(source,'simulator')
         pointsub = rossubscriber('/xtion/depth_registered/points');
     end;
 end;
+
+
+[net,normalize_fn] = initializeCNN(NETWORK_PATH, NET_NAME);
+for i=0:10 % zero time
+    video = VideoReader(sourceDir);
+    video.CurrentTime = i;
+    image = readFrame(video);
+    
+    scores = executeCNN(image,net,normalize_fn);
+    imshowCNN(image, scores);    
+end;
+
 
 
 for i=1:50
