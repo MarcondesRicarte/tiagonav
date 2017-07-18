@@ -20,24 +20,39 @@ function [image] = imshowCNN(img, scores)
     % Display the image and it's segmentation side by side
     [~, predicted_labels] = max(scores, [], 3);
     figure(234);
-    subplot(2,2,1);
+    subplot(1,2,1);
     imshow(img);
 
-    subplot(2,2,2);
-    imgClusters = image(uint8(predicted_labels-1)) ;
-    title('clusters') ;
-    colormap(cmap) ;
-    imshow(im);
+    %try
+    %    subplot(2,2,2);
+    %    imgClusters = image(uint8(predicted_labels-1)) ;
+    %    title('clusters') ;
+    %    colormap(cmap);
+    %    imshow(imgClusters);
+    %end;
     
-    
-    subplot(2,2,3);
+    subplot(1,2,2);
     imgContours = uint8(predicted_labels-1);
     [counts,x] = imhist(imgContours,16);
     T = otsuthresh(counts);
     bw = imbinarize(imgContours,T);
     [bw, threshold] = edge(bw, 'sobel');
-    imgContoursColor = mtimes(imgContours, bw);
-    imshow(imgContours);
+    imgContoursColor = times(imgContours,uint8(bw));
+    [B,L]= bwboundaries(bw);
+    imshow(img)
+    hold on
+    for k = 1:length(B)
+        boundary = B{k};
+        plot(boundary(:,2), boundary(:,1), 'w', 'LineWidth', 2, 'Color', 'red')
+    end
     pause(1);
 
+    
+    % Object geometry data
+    Ilabel = bwlabel(bw);
+    geometry.centroids = regionprops(Ilabel,'centroid');
+    geometry.convexHull = regionprops(Ilabel,'ConvexHull');
+    
+    
+    
 end

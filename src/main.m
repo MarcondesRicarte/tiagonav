@@ -4,8 +4,8 @@ clear all;
 connect = 'tiago';      % ['turtle','tiago'] 
 source = 'file';        % ['file', 'simulator']
 sourceDir = 'videos\amb1low.mp4';  % ['videos\amb1low.mp4', 'videos\amb2low.mp4', 'videos\amb1high.mp4', 'videos\amb1high.mp4']
-NETWORK_PATH = 'matconvnet-1.0-beta24\models';
-NET_NAME = 'pascal-fcn8s-dag.mat';
+NETWORK_PATH = 'matconvnet-1.0-beta24\models'; 
+NET_NAME = 'pascal-fcn8s-dag.mat'; % ['pascal-fcn8s-dag.mat', 'pascal-fcn16s-dag.mat', 'pascal-fcn32s-dag.mat', 'pascal-fcn8s-tvg-dag.mat']
 DATA_DIR = fullfile('data', 'images');
 RESULT_DIR = fullfile('data', 'unaries');
 
