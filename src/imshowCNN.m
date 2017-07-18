@@ -1,4 +1,4 @@
-function [image] = imshowCNN(img, scores)
+function [image] = imshowCNN(img, net, scores)
 
     %% Visualize the result
     % Copied from https://github.com/vlfeat/matconvnet-fcn/blob/master/fcnTest.m#L220 
@@ -24,7 +24,7 @@ function [image] = imshowCNN(img, scores)
     imshow(img);
 
     %try
-    %    subplot(2,2,2);
+    %    subplot(1,2,2);
     %    imgClusters = image(uint8(predicted_labels-1)) ;
     %    title('clusters') ;
     %    colormap(cmap);
@@ -53,6 +53,13 @@ function [image] = imshowCNN(img, scores)
     geometry.centroids = regionprops(Ilabel,'centroid');
     geometry.convexHull = regionprops(Ilabel,'ConvexHull');
     
-    
+    nCentroids = length(geometry.centroids);
+    for i = 1:nCentroids
+        annotation('textbox',...
+        [0.15 0.65 0.3 0.15],...
+        'String','test',...
+        'Color','red');
+        imshow(img);
+    end;
     
 end

@@ -52,7 +52,7 @@ for i=0:10 % zero time
     image = readFrame(video);
     
     scores = executeCNN(image,net,normalize_fn);
-    imshowCNN(image, scores);    
+    imshowCNN(image, net, scores);    
 end;
 
 
