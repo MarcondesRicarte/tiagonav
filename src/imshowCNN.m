@@ -52,14 +52,20 @@ function [image] = imshowCNN(img, net, scores)
     Ilabel = bwlabel(bw);
     geometry.centroids = regionprops(Ilabel,'centroid');
     geometry.convexHull = regionprops(Ilabel,'ConvexHull');
+    geometry.convexArea = regionprops(Ilabel,'ConvexArea');
     
     nCentroids = length(geometry.centroids);
     for i = 1:nCentroids
+        centroid = geometry.centroids(i);
+        x1 = centroid.Centroid(1)/640;
+        x2 = (x1 + 50)/640;
+        y1 = centroid.Centroid(2)/480;
+        y2 = (y1 + 20)/480;
         annotation('textbox',...
-        [0.15 0.65 0.3 0.15],...
-        'String','test',...
-        'Color','red');
-        imshow(img);
+        [x1 y1 x2 y2],...
+        'String',net.meta.classes.name(i),...
+        'Color','red');        
     end;
+    imshow(img);
     
 end
