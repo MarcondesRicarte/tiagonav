@@ -1,13 +1,16 @@
 % config
 clear all;
 
-connect = 'tiago';      % ['turtle','tiago'] 
+connect = 'tiago';      % ['turtle','tiago','robot'] 
 source = 'file';        % ['file', 'simulator']
 sourceDir = 'videos\amb1low.mp4';  % ['videos\amb1low.mp4', 'videos\amb2low.mp4', 'videos\amb1high.mp4', 'videos\amb1high.mp4']
 NETWORK_PATH = 'matconvnet-1.0-beta24\models'; 
 NET_NAME = 'pascal-fcn8s-dag.mat'; % ['pascal-fcn8s-dag.mat', 'pascal-fcn16s-dag.mat', 'pascal-fcn32s-dag.mat', 'pascal-fcn8s-tvg-dag.mat']
 DATA_DIR = fullfile('data', 'images');
 RESULT_DIR = fullfile('data', 'unaries');
+FLAG_RGB = 'true';
+FLAG_RGB_D = 'false';
+FLAG_POINT_CLOUD = 'false';
 
 
 imsub = 0;
@@ -16,101 +19,125 @@ pointsub = 0;
 if strcmp(source,'simulator')
     if strcmp(connect,'tiago') 
         % Connect  TIAGo robot
+        disp('Connecting with TIAGo vitual...');
         setenv('ROS_MASTER_URI','http://192.168.3.129:11311')
         setenv('ROS_IP','192.168.254.1')
-        rosinit
+        rosinit        
+    elseif strcmp(connect,'robot')
+        %Tutllebot
+        disp('Connecting with TIAGo...');
+        ipaddress = '10.68.0.1';
+        rosinit(ipaddress);    
     elseif strcmp(connect,'turtle')
         %Tutllebot
+        disp('Connecting with Tutllebot...');
         ipaddress = '192.168.3.133';
         rosinit(ipaddress);
     end;
 
     % Get image
+    disp('Subscribering with Camera RGB...');
     imsub = 0;
     if ismember('/xtion/rgb/image_raw', rostopic('list'))
         imsub = rossubscriber('/xtion/rgb/image_raw');
     end;
 
     % Get depth image
+    disp('Subscribering with Camera Depth...');
     depthsub = 0;
     if ismember('/xtion/depth_registered/image_raw', rostopic('list'))
         depthsub = rossubscriber('/xtion/depth_registered/image_raw');
     end;
 
     % Get cloud point
+    disp('Subscribering with Cloud Point...');
     pointsub = 0;
     if ismember('/xtion/depth_registered/points', rostopic('list'))
         pointsub = rossubscriber('/xtion/depth_registered/points');
     end;
 end;
 
-
+disp('Initializing Neural Networks...');
 [net,normalize_fn] = initializeCNN(NETWORK_PATH, NET_NAME);
-for i=0:10 % zero time
-    video = VideoReader(sourceDir);
-    video.CurrentTime = i;
-    image = readFrame(video);
-    
-    scores = executeCNN(image,net,normalize_fn);
-    imshowCNN(image, net, scores);    
+
+% File
+if strcmp(source,'file')
+    for i=0:10 % zero time
+        video = VideoReader(sourceDir);
+        video.CurrentTime = i;
+        image = readFrame(video);
+
+        scores = executeCNN(image,net,normalize_fn);
+        imshowCNN(image, net, scores);    
+    end;
 end;
 
 
-
-for i=1:50
-    load ([sourceDir, num2str(i), '.mat']);
+% Robot
+while 1
+    %load ([sourceDir, num2str(i), '.mat']);
     
     % plot image
-    if imsub ~= 0
-        image = receive(imsub);
-        figure
-        imshow(readImage(image));
+    if strcmp(FLAG_RGB,'true')
+        if imsub ~= 0
+            image = receive(imsub);
+            %figure
+            image = readImage(image);
+            %imshow(readImage(image));
+            
+            scores = executeCNN(image,net,normalize_fn);
+            imshowCNN(image, net, scores);
+        end;
     end;
 
-
     % plot depth image
-    if depthsub ~= 0
-        depthImage = receive(depthsub);
-        figure
-        imshow(readImage(depthImage));
+    if strcmp(FLAG_RGB_D,'true')
+        if depthsub ~= 0
+            depthImage = receive(depthsub);
+            figure
+            imshow(readImage(depthImage));
+        end;
     end;
 
 
     % plot cloud points
-    if pointsub ~= 0
-        ptcloud = receive(pointsub);
-        xyz = readXYZ(ptcloud);
-        xyzvalid = xyz(~isnan(xyz(:,1)),:);
-        xyzselected = xyz(xyz(:,3)< 2,:);
-        %rgb = readRGB(ptcloud);
-        scatter3(ptcloud);
+    if strcmp(FLAG_RGB_D,'true')
 
-        %scatter(xyzselected(:,1),xyzselected(:,2))
-        pcobj = pointCloud(readXYZ(ptcloud),'Color',uint8(255*readRGB(ptcloud)));
+        if pointsub ~= 0
+            ptcloud = receive(pointsub);
+            xyz = readXYZ(ptcloud);
+            xyzvalid = xyz(~isnan(xyz(:,1)),:);
+            xyzselected = xyz(xyz(:,3)< 2,:);
+            %rgb = readRGB(ptcloud);
+            scatter3(ptcloud);
+
+            %scatter(xyzselected(:,1),xyzselected(:,2))
+            pcobj = pointCloud(readXYZ(ptcloud),'Color',uint8(255*readRGB(ptcloud)));
 
 
-        % parser cordinates
-        minX = min(xyz(:,1));
-        maxX = max(xyz(:,1));
-        minY = min(xyz(:,2));
-        maxY = max(xyz(:,2));
-        minZ = min(xyz(:,3));
-        maxZ = max(xyz(:,3));
+            % parser cordinates
+            minX = min(xyz(:,1));
+            maxX = max(xyz(:,1));
+            minY = min(xyz(:,2));
+            maxY = max(xyz(:,2));
+            minZ = min(xyz(:,3));
+            maxZ = max(xyz(:,3));
 
-        sizeX = - minX + maxX;
-        sizeY = - minY + maxY;
-        sizeZ = minZ + maxZ;
+            sizeX = - minX + maxX;
+            sizeY = - minY + maxY;
+            sizeZ = minZ + maxZ;
 
-        pcshow(pcobj)
-        roi = [0,inf;0,inf;0,2.5];
-        indices = findPointsInROI(pcobj, roi);
-        obj = select(pcobj,indices);
+            pcshow(pcobj)
+            roi = [0,inf;0,inf;0,2.5];
+            indices = findPointsInROI(pcobj, roi);
+            obj = select(pcobj,indices);
 
-        pcshow(pcobj.Location,'r');
-        hold on;
-        pcshow(obj.Location,'g');
-        hold off;
+            pcshow(pcobj.Location,'r');
+            hold on;
+            pcshow(obj.Location,'g');
+            hold off;
 
+        end;
     end;
     
     imwrite(readImage(image),['image',int2str(i),'.png']);

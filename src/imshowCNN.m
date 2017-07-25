@@ -19,9 +19,9 @@ function [image] = imshowCNN(img, net, scores)
 
     % Display the image and it's segmentation side by side
     [~, predicted_labels] = max(scores, [], 3);
-    figure(234);
-    subplot(1,2,1);
-    imshow(img);
+%     figure(234);
+%     subplot(1,2,1);
+%     imshow(img);
 
     %try
     %    subplot(1,2,2);
@@ -31,7 +31,7 @@ function [image] = imshowCNN(img, net, scores)
     %    imshow(imgClusters);
     %end;
     
-    subplot(1,2,2);
+%    subplot(1,2,2);
     imgContours = uint8(predicted_labels-1);
     [counts,x] = imhist(imgContours,16);
     T = otsuthresh(counts);
@@ -45,12 +45,21 @@ function [image] = imshowCNN(img, net, scores)
     [B,L]= bwboundaries(bw);
     imshow(img)
     hold on
+
+    % Object geometry data
+    Ilabel = bwlabel(bw);
+    geometry.centroids = regionprops(Ilabel,'centroid');
+    geometry.convexHull = regionprops(Ilabel,'ConvexHull');
+    geometry.convexArea = regionprops(Ilabel,'ConvexArea');
+    
     
     % draw contours
     for k = 1:length(B)
-        boundary = B{k};
-        plot(boundary(:,2), boundary(:,1), 'w', 'LineWidth', 2, 'Color', 'red')
-    end
+        %if geometry.convexArea(k).ConvexArea > 100
+            boundary = B{k};
+            plot(boundary(:,2), boundary(:,1), 'w', 'LineWidth', 2, 'Color', 'red')
+        %end;
+    end;
     
     % draw way
     if strcmp(coord.lines,'one')
@@ -66,14 +75,6 @@ function [image] = imshowCNN(img, net, scores)
     end;    
     pause(1);
 
-    
-    
-    
-    % Object geometry data
-    Ilabel = bwlabel(bw);
-    geometry.centroids = regionprops(Ilabel,'centroid');
-    geometry.convexHull = regionprops(Ilabel,'ConvexHull');
-    geometry.convexArea = regionprops(Ilabel,'ConvexArea');
     
     nCentroids = length(geometry.centroids);
     for i = 1:nCentroids
