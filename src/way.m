@@ -6,7 +6,7 @@ coord.xf = 470;
 coord.yi = 470;
 coord.ym = 470;
 coord.yf = 370;
-coord.lines = 'two';
+coord.lines = 'one';
 
 xi = coord.xi;
 xf = coord.xf;
@@ -21,7 +21,7 @@ imshow(im)
 if strcmp(coord.lines,'one')
     disp('oi');
     line([xi xf], [yi yf],'LineWidth',5,'color', 'green')
-    viscircles([xi yi], [5],'Color','green','LineWidth',7)
+    viscircles([xi yi], [10],'Color','green','LineWidth',10)
     viscircles([xf yf], [5],'Color','green','LineWidth',7)
 else
     line([xi xm], [yi ym],'LineWidth',5,'color', 'green')

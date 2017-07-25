@@ -36,6 +36,7 @@ function [image] = imshowCNN(img, net, scores)
     [counts,x] = imhist(imgContours,16);
     T = otsuthresh(counts);
     bw = imbinarize(imgContours,T);
+    holes = bw;
     [bw, threshold] = edge(bw, 'sobel');
     imgContoursColor = times(imgContours,uint8(bw));
     [B,L]= bwboundaries(bw);
