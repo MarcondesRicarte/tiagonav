@@ -37,17 +37,37 @@ function [image] = imshowCNN(img, net, scores)
     T = otsuthresh(counts);
     bw = imbinarize(imgContours,T);
     holes = bw;
+    x = 320;
+    y = 370;
+    [coord] = findHole(holes,x,y);       
     [bw, threshold] = edge(bw, 'sobel');
     imgContoursColor = times(imgContours,uint8(bw));
     [B,L]= bwboundaries(bw);
     imshow(img)
     hold on
+    
+    % draw contours
     for k = 1:length(B)
         boundary = B{k};
         plot(boundary(:,2), boundary(:,1), 'w', 'LineWidth', 2, 'Color', 'red')
     end
+    
+    % draw way
+    if strcmp(coord.lines,'one')
+        line([coord.xi coord.xf], [coord.yi coord.yf],'LineWidth',5,'color', 'green')
+        viscircles([coord.xi coord.yi], [10],'Color','green','LineWidth',10)
+        viscircles([coord.xf coord.yf], [5],'Color','green','LineWidth',7)
+    else
+        line([coord.xi coord.xm], [coord.yi coord.ym],'LineWidth',5,'color', 'green')
+        line([coord.xm coord.xf], [coord.ym coord.yf],'LineWidth',5,'color', 'green')
+        viscircles([coord.xi coord.yi], [5],'Color','green','LineWidth',7)
+        viscircles([coord.xm coord.ym], [5],'Color','green','LineWidth',7)
+        viscircles([coord.xf coord.yf], [5],'Color','green','LineWidth',7)
+    end;    
     pause(1);
 
+    
+    
     
     % Object geometry data
     Ilabel = bwlabel(bw);

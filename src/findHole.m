@@ -1,5 +1,4 @@
-function [findX] = findHole(x,y)
-
+function [coord] = findHole(img,x,y)
 
     %x = 320;
     %y = 470;
@@ -17,5 +16,17 @@ function [findX] = findHole(x,y)
         end
     end;
 
+    coord.xi = 320;
+    coord.yi = 470;
+    coord.xf = findX;
+    coord.yf = 370;
+    
+    if findX > 600 | findX < 150
+        coord.lines = 'two';
+        coord.xm = findX;
+        coord.ym = 470;
+    else
+        coord.lines = 'one';
+    end;
     
 end
