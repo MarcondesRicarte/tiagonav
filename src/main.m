@@ -62,13 +62,15 @@ disp('Initializing Neural Networks...');
 
 % File
 if strcmp(source,'file')
+    video = VideoReader(sourceDir);
     for i=0:10 % zero time
-        video = VideoReader(sourceDir);
+        tic
         video.CurrentTime = i;
         image = readFrame(video);
 
         scores = executeCNN(image,net,normalize_fn);
-        imshowCNN(image, net, scores);    
+        imshowCNN(image, net, scores);
+        toc
     end;
 end;
 

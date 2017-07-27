@@ -3,19 +3,19 @@ function [image] = imshowCNN(img, net, scores)
     %% Visualize the result
     % Copied from https://github.com/vlfeat/matconvnet-fcn/blob/master/fcnTest.m#L220 
     % First create the colour map for it
-    N=21;
-    cmap = zeros(N,3);
-    for i=1:N
-      id = i-1; r=0;g=0;b=0;
-      for j=0:7
-        r = bitor(r, bitshift(bitget(id,1),7 - j));
-        g = bitor(g, bitshift(bitget(id,2),7 - j));
-        b = bitor(b, bitshift(bitget(id,3),7 - j));
-        id = bitshift(id,-3);
-      end
-      cmap(i,1)=r; cmap(i,2)=g; cmap(i,3)=b;
-    end
-    cmap = cmap / 255;
+% % %     N=21;
+% % %     cmap = zeros(N,3);
+% % %     for i=1:N
+% % %       id = i-1; r=0;g=0;b=0;
+% % %       for j=0:7
+% % %         r = bitor(r, bitshift(bitget(id,1),7 - j));
+% % %         g = bitor(g, bitshift(bitget(id,2),7 - j));
+% % %         b = bitor(b, bitshift(bitget(id,3),7 - j));
+% % %         id = bitshift(id,-3);
+% % %       end
+% % %       cmap(i,1)=r; cmap(i,2)=g; cmap(i,3)=b;
+% % %     end
+% % %     cmap = cmap / 255;
 
     % Display the image and it's segmentation side by side
     [~, predicted_labels] = max(scores, [], 3);
@@ -48,17 +48,17 @@ function [image] = imshowCNN(img, net, scores)
 
     % Object geometry data
     Ilabel = bwlabel(bw);
-    geometry.centroids = regionprops(Ilabel,'centroid');
-    geometry.convexHull = regionprops(Ilabel,'ConvexHull');
+    %geometry.centroids = regionprops(Ilabel,'centroid');
+    %geometry.convexHull = regionprops(Ilabel,'ConvexHull');
     geometry.convexArea = regionprops(Ilabel,'ConvexArea');
     
     
     % draw contours
     for k = 1:length(B)
-        %if geometry.convexArea(k).ConvexArea > 100
-            boundary = B{k};
+        boundary = B{k};
+        if length(boundary) > 100
             plot(boundary(:,2), boundary(:,1), 'w', 'LineWidth', 2, 'Color', 'red')
-        %end;
+        end;
     end;
     
     % draw way
@@ -76,18 +76,18 @@ function [image] = imshowCNN(img, net, scores)
     pause(1);
 
     
-    nCentroids = length(geometry.centroids);
-    for i = 1:nCentroids
-        centroid = geometry.centroids(i);
-        x1 = centroid.Centroid(1)/640;
-        x2 = (x1 + 50)/640;
-        y1 = centroid.Centroid(2)/480;
-        y2 = (y1 + 20)/480;
-        annotation('textbox',...
-        [x1 y1 x2 y2],...
-        'String',net.meta.classes.name(i),...
-        'Color','red');        
-    end;
-    imshow(img);
+%     nCentroids = length(geometry.centroids);
+%     for i = 1:nCentroids
+%         centroid = geometry.centroids(i);
+%         x1 = centroid.Centroid(1)/640;
+%         x2 = (x1 + 50)/640;
+%         y1 = centroid.Centroid(2)/480;
+%         y2 = (y1 + 20)/480;
+%         annotation('textbox',...
+%         [x1 y1 x2 y2],...
+%         'String',net.meta.classes.name(i),...
+%         'Color','red');        
+%     end;
+%     imshow(img);
     
 end
