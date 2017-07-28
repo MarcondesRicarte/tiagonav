@@ -5,10 +5,10 @@ function [coord] = findHole(img,x,y)
 
     step = 1;
     for step=0:320 
-        if img(x+step,y) == 0
+        if img(x+step,y) == 1 % 0 - file, 1 - robot
             findX = x+step;
             break;
-        elseif img(x-step,y) == 0
+        elseif img(x-step,y) == 1
             findX = x-step;
             break;
         else

@@ -90,8 +90,8 @@ function [image] = imshowCNN(img, net, scores,frame)
 %     end;
 %     imshow(img);
     
-    f = getframe(gca);
-    im = frame2im(f);
-    imwrite(im,['results/image',int2str(frame),'.png']);
+%     f = getframe(gca);
+%     im = frame2im(f);
+%     imwrite(im,['results/tiagoRA',int2str(frame),'.png']);
     
 end

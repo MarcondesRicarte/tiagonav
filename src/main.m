@@ -1,8 +1,8 @@
 % config
 clear all;
 
-connect = 'tiago';      % ['turtle','tiago','robot'] 
-source = 'file';        % ['file', 'simulator']
+connect = 'robot';      % ['turtle','tiago','robot'] 
+source = 'simulator';        % ['file', 'simulator']
 sourceDir = 'videos\amb1low.mp4';  % ['videos\amb1low.mp4', 'videos\amb2low.mp4', 'videos\amb1high.mp4', 'videos\amb1high.mp4']
 NETWORK_PATH = 'matconvnet-1.0-beta24\models'; 
 NET_NAME = 'pascal-fcn8s-dag.mat'; % ['pascal-fcn8s-dag.mat', 'pascal-fcn16s-dag.mat', 'pascal-fcn32s-dag.mat', 'pascal-fcn8s-tvg-dag.mat']
@@ -74,21 +74,22 @@ if strcmp(source,'file')
     end;
 end;
 
-
+frame = 1;
 % Robot
 while 1
     %load ([sourceDir, num2str(i), '.mat']);
     
     % plot image
+    
     if strcmp(FLAG_RGB,'true')
         if imsub ~= 0
             image = receive(imsub);
-            %figure
             image = readImage(image);
-            %imshow(readImage(image));
-            
+            %imshow(image);
+            %imwrite(image,['results/tiago',int2str(frame),'.png']);
+            frame = frame + 1;
             scores = executeCNN(image,net,normalize_fn);
-            imshowCNN(image, net, scores);
+            imshowCNN(image, net, scores,frame);
         end;
     end;
 
@@ -142,13 +143,13 @@ while 1
         end;
     end;
     
-    imwrite(readImage(image),['image',int2str(i),'.png']);
-    Segmentation(readImage(image),['imageContour',int2str(i),'.png']);
-    close(gcf);
-    scatter3(ptcloud);
-    f = getframe(gca);
-    im = frame2im(f);
-    imwrite(im,['ptcloud',int2str(i),'.png']);
+%     imwrite(readImage(image),['image',int2str(i),'.png']);
+%     Segmentation(readImage(image),['imageContour',int2str(i),'.png']);
+%     close(gcf);
+%     scatter3(ptcloud);
+%     f = getframe(gca);
+%     im = frame2im(f);
+%     imwrite(im,['ptcloud',int2str(i),'.png']);
     
 end;
 
