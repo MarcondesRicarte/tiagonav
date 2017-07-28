@@ -1,4 +1,4 @@
-function [image] = imshowCNN(img, net, scores)
+function [image] = imshowCNN(img, net, scores,frame)
 
     %% Visualize the result
     % Copied from https://github.com/vlfeat/matconvnet-fcn/blob/master/fcnTest.m#L220 
@@ -89,5 +89,9 @@ function [image] = imshowCNN(img, net, scores)
 %         'Color','red');        
 %     end;
 %     imshow(img);
+    
+    f = getframe(gca);
+    im = frame2im(f);
+    imwrite(im,['results/image',int2str(frame),'.png']);
     
 end
