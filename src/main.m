@@ -1,9 +1,9 @@
 % config
 clear all;
 
-connect = 'robot';      % ['turtle','tiago','robot'] 
-source = 'simulator';        % ['file', 'simulator']
-sourceDir = 'videos\amb1low.mp4';  % ['videos\amb1low.mp4', 'videos\amb2low.mp4', 'videos\amb1high.mp4', 'videos\amb1high.mp4']
+connect = 'tiago';      % ['turtle','tiago','robot'] 
+source = 'file';        % ['file', 'simulator']
+sourceDir = 'videos\home4.mp4';  % ['videos\home3.mp4', 'videos\lab.mp4', 'videos\amb1low.mp4', 'videos\amb2low.mp4', 'videos\amb1high.mp4', 'videos\amb1high.mp4']
 NETWORK_PATH = 'matconvnet-1.0-beta24\models'; 
 NET_NAME = 'pascal-fcn8s-dag.mat'; % ['pascal-fcn8s-dag.mat', 'pascal-fcn16s-dag.mat', 'pascal-fcn32s-dag.mat', 'pascal-fcn8s-tvg-dag.mat']
 DATA_DIR = fullfile('data', 'images');
@@ -63,11 +63,13 @@ disp('Initializing Neural Networks...');
 % File
 if strcmp(source,'file')
     video = VideoReader(sourceDir);
-    for i=0:17 % zero time
+    for i=0:42 % zero time
         tic
         video.CurrentTime = i;
         image = readFrame(video);
-
+        %image = imread(['results\tiago', int2str(i), '.png']);
+        image = imresize(image, [480 640]);
+        
         scores = executeCNN(image,net,normalize_fn);
         imshowCNN(image, net, scores,i);
         toc

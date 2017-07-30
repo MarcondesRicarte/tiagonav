@@ -3,19 +3,19 @@ function [image] = imshowCNN(img, net, scores,frame)
     %% Visualize the result
     % Copied from https://github.com/vlfeat/matconvnet-fcn/blob/master/fcnTest.m#L220 
     % First create the colour map for it
-% % %     N=21;
-% % %     cmap = zeros(N,3);
-% % %     for i=1:N
-% % %       id = i-1; r=0;g=0;b=0;
-% % %       for j=0:7
-% % %         r = bitor(r, bitshift(bitget(id,1),7 - j));
-% % %         g = bitor(g, bitshift(bitget(id,2),7 - j));
-% % %         b = bitor(b, bitshift(bitget(id,3),7 - j));
-% % %         id = bitshift(id,-3);
-% % %       end
-% % %       cmap(i,1)=r; cmap(i,2)=g; cmap(i,3)=b;
-% % %     end
-% % %     cmap = cmap / 255;
+%     N=21;
+%     cmap = zeros(N,3);
+%     for i=1:N
+%       id = i-1; r=0;g=0;b=0;
+%       for j=0:7
+%         r = bitor(r, bitshift(bitget(id,1),7 - j));
+%         g = bitor(g, bitshift(bitget(id,2),7 - j));
+%         b = bitor(b, bitshift(bitget(id,3),7 - j));
+%         id = bitshift(id,-3);
+%       end
+%       cmap(i,1)=r; cmap(i,2)=g; cmap(i,3)=b;
+%     end
+%     cmap = cmap / 255;
 
     % Display the image and it's segmentation side by side
     [~, predicted_labels] = max(scores, [], 3);
@@ -90,8 +90,8 @@ function [image] = imshowCNN(img, net, scores,frame)
 %     end;
 %     imshow(img);
     
-%     f = getframe(gca);
-%     im = frame2im(f);
-%     imwrite(im,['results/tiagoRA',int2str(frame),'.png']);
+     f = getframe(gca);
+     im = frame2im(f);
+     imwrite(im,['results/home',int2str(frame),'.png']);
     
 end
