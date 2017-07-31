@@ -63,7 +63,7 @@ disp('Initializing Neural Networks...');
 % File
 if strcmp(source,'file')
     video = VideoReader(sourceDir);
-    for i=0:42 % zero time
+    for i=0:0.1:42 % zero time
         tic
         video.CurrentTime = i;
         image = readFrame(video);
