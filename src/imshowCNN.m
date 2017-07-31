@@ -37,9 +37,10 @@ function [image] = imshowCNN(img, net, scores,frame)
     T = otsuthresh(counts);
     bw = imbinarize(imgContours,T);
     holes = bw;
-    x = 320;
-    y = 370;
-    [coord] = findHole(holes,x,y);       
+    fator = 1;
+    x = 320/fator;
+    y = 350/fator;
+    [coord] = findHole(holes,x,y, fator);       
     [bw, threshold] = edge(bw, 'sobel');
     imgContoursColor = times(imgContours,uint8(bw));
     [B,L]= bwboundaries(bw);
@@ -64,7 +65,7 @@ function [image] = imshowCNN(img, net, scores,frame)
     % draw way
     if strcmp(coord.lines,'one')
         line([coord.xi coord.xf], [coord.yi coord.yf],'LineWidth',5,'color', 'green')
-        viscircles([coord.xi coord.yi], [10],'Color','green','LineWidth',10)
+        viscircles([coord.xi coord.yi], [5],'Color','green','LineWidth',7)
         viscircles([coord.xf coord.yf], [5],'Color','green','LineWidth',7)
     else
         line([coord.xi coord.xm], [coord.yi coord.ym],'LineWidth',5,'color', 'green')
